@@ -9,7 +9,9 @@ from tensorflow.keras import backend as K
 
 class DiagnosisService:
     def __init__(self):
-        self.model = load_model('../trained_models/MobileNetV2.keras')
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        model_path = os.path.join(current_dir, '../trained_models/MobileNetV2.keras')
+        self.model = load_model(model_path)
         self.img_size = (224, 224)
 
     def preprocess(self, image_bytes):

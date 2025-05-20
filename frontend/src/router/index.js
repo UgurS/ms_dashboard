@@ -5,6 +5,7 @@ import LoginPage from '@/pages/LoginPage.vue'
 
 import { createPinia, setActivePinia } from 'pinia'
 import { useAuthStore } from '@/stores/authStore'
+import DiagnosisPage from "@/pages/DiagnosisPage.vue";
 
 // Activate Pinia in the router file for early access
 setActivePinia(createPinia())
@@ -13,6 +14,7 @@ const routes = [
     { path: '/', redirect: '/patients' },
     { path: '/login', component: LoginPage },
     { path: '/patients', component: PatientsPage, meta: { requiresAuth: true } },
+    { path: '/diagnosis', component: DiagnosisPage, meta: { requiresAuth: true } },
     { path: '/history', component: HistoryPage, meta: { requiresAuth: true } }
 ]
 
