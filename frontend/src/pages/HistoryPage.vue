@@ -3,7 +3,19 @@
         <h1 class="text-2xl font-semibold text-gray-900 mb-6">History</h1>
         <p class="text-gray-600 mb-6">You are viewing the History section.</p>
 
-        <div class="bg-white shadow rounded-lg overflow-hidden">
+        <div
+            v-if="diagnosisStore.loadingHistory"
+            class="p-4 text-center text-gray-500"
+        >
+            Loading history...
+        </div>
+        <div
+            v-else-if="diagnosisStore.historyError"
+            class="p-4 text-center text-red-500"
+        >
+            {{ diagnosisStore.historyError }}
+        </div>
+        <div v-else class="bg-white shadow rounded-lg overflow-hidden">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
@@ -31,7 +43,16 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    <tr v-for="record in historyRecords" :key="record.id">
+                    <tr v-if="diagnosisStore.historyRecords.length === 0">
+                        <td colspan="5" class="text-center py-6 text-gray-500">
+                            No Results Found
+                        </td>
+                    </tr>
+                    <tr
+                        v-else
+                        v-for="record in diagnosisStore.historyRecords"
+                        :key="record.id"
+                    >
                         <td
                             class="px-4 py-2 whitespace-nowrap text-sm text-gray-900"
                         >
@@ -70,29 +91,16 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { onMounted } from "vue";
+import { useDiagnosisStore } from "../stores/diagnosisStore";
 
-// Example data, replace with API call or store as needed
-const historyRecords = ref([
-    {
-        id: 1,
-        patient: "John Doe",
-        date: "2024-05-01",
-        diagnosis: "Condition A",
-        confidence: "95%",
-    },
-    {
-        id: 2,
-        patient: "Jane Smith",
-        date: "2024-05-02",
-        diagnosis: "Condition B",
-        confidence: "88%",
-    },
-    // Add more records as needed
-]);
+const diagnosisStore = useDiagnosisStore();
+
+onMounted(() => {
+    diagnosisStore.fetchHistoryRecords();
+});
 
 function viewReport(record) {
-    // Placeholder for report logic
     alert(`Viewing report for ${record.patient}`);
 }
 </script>
