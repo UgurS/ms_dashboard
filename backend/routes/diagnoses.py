@@ -89,3 +89,31 @@ def get_all_diagnoses():
         "has_next": pagination.has_next,
         "has_prev": pagination.has_prev,
     })
+@diagnosis_bp.route('/patient/<int:patient_id>', methods=['GET'])
+@jwt_required()
+def get_diagnoses_for_patient(patient_id):
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
+
+    pagination = Diagnosis.query.filter_by(patient_id=patient_id).order_by(Diagnosis.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
+    diagnoses = pagination.items
+    results = []
+    for diag in diagnoses:
+        patient = Patient.query.get(diag.patient_id)
+        results.append({
+            "id": diag.id,
+            "patient": f"{patient.first_name} {patient.last_name}" if patient else "Unknown",
+            "date": diag.created_at.strftime('%Y-%m-%d'),
+            "diagnosis": diag.prediction,
+            "confidence": f"{int(diag.confidence * 100)}%",
+            "model_used": diag.model_used,
+        })
+    return jsonify({
+        "diagnoses": results,
+        "page": pagination.page,
+        "per_page": pagination.per_page,
+        "total": pagination.total,
+        "pages": pagination.pages,
+        "has_next": pagination.has_next,
+        "has_prev": pagination.has_prev,
+    })
