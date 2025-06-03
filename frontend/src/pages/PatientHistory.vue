@@ -1,8 +1,10 @@
 <template>
     <div>
         <h1 class="text-2xl font-semibold text-gray-900 mb-6">
-            Diagnosis Report
+            <span v-if="patientName">{{ patientName }}</span>
+            <span v-else>Loading...</span>
         </h1>
+
         <p class="text-gray-600 mb-6">
             You are viewing the diagnosis report for this patient.
         </p>
@@ -98,12 +100,15 @@
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useDiagnosisStore } from "@/stores/diagnosisStore.js";
+import { usePatientStore } from "@/stores/patientStore.js";
 const diagnosisStore = useDiagnosisStore();
+const patientStore = usePatientStore();
 const route = useRoute();
 const router = useRouter();
 const diagnoses = ref([]);
 const loading = ref(true);
 const error = ref("");
+const patientName = ref("Unknown Patient");
 
 function viewReport(record) {
     router.push({ name: "DiagnosisReport", params: { id: record.id } });
@@ -111,6 +116,11 @@ function viewReport(record) {
 
 onMounted(async () => {
     try {
+        await patientStore.fetchPatients();
+        const p = patientStore.patients.find(
+            (x) => String(x.id) === String(route.params.id)
+        );
+        if (p) patientName.value = `${p.first_name} ${p.last_name}`;
         // Fetch all diagnoses for this patient (route.params.id)
         const data = await diagnosisStore.getDiagnosesForPatient(
             route.params.id
