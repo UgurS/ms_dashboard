@@ -77,8 +77,8 @@ class DiagnosisService:
 
         # Build grad model
         grad_model = tf.keras.models.Model(
-            [self.model.inputs],
-            [self.model.get_layer(last_conv_layer_name).output, self.model.output]
+            inputs=self.model.input,
+            outputs=[self.model.get_layer(last_conv_layer_name).output, self.model.output]
         )
 
         with tf.GradientTape() as tape:
