@@ -68,5 +68,19 @@ export const useDiagnosisStore = defineStore("diagnosis", {
         this.loadingDiagnosis = false;
       }
     },
+
+    async getDiagnosisById(id) {
+      try {
+        const response = await api.get(`/diagnoses/${id}`);
+        return response.data;
+      } catch (err) {
+        throw new Error(
+            err.response?.data?.error ||
+            err.response?.data?.message ||
+            err.message ||
+            "Failed to fetch diagnosis report."
+        );
+      }
+    }
   },
 });

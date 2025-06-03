@@ -3,23 +3,7 @@
   <div class="px-6 py-8 max-w-4xl mx-auto">
     <!-- 1) HEADER & GREETING -->
     <div class="flex items-center mb-4">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="h-6 w-6 text-gray-700 mr-2"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        stroke-width="2"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M9 4v2m0 0a1 1 0 000 2h2a1 1 0 000-2H9m0 0V4 
-             m6 2v2m0 0a1 1 0 000 2h2a1 1 0 000-2h-2m0 0V6 
-             m0 0h-2m2 0h2m-4 4a4 4 0 100 8 4 4 0 000-8 
-             zm-6 4h12"
-        />
-      </svg>
+      <svg class="mr-3 h-5 w-5" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M160 32c0-17.7 14.3-32 32-32l32 0c17.7 0 32 14.3 32 32c17.7 0 32 14.3 32 32l0 224c0 17.7-14.3 32-32 32c0 17.7-14.3 32-32 32l-32 0c-17.7 0-32-14.3-32-32c-17.7 0-32-14.3-32-32l0-224c0-17.7 14.3-32 32-32zM32 448l288 0c70.7 0 128-57.3 128-128s-57.3-128-128-128l0-64c106 0 192 86 192 192c0 49.2-18.5 94-48.9 128l16.9 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-160 0L32 512c-17.7 0-32-14.3-32-32s14.3-32 32-32zm80-64l192 0c8.8 0 16 7.2 16 16s-7.2 16-16 16l-192 0c-8.8 0-16-7.2-16-16s7.2-16 16-16z"></path></svg>
       <span class="text-gray-800 font-medium text-lg">{{ patientName }}</span>
     </div>
     <p class="text-gray-600 mb-6">
@@ -103,7 +87,7 @@
           <select
             id="modelSelect"
             v-model="selectedModel"
-            class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-indigo-500 focus:border-indigo-500"
+            class="border border-transparent border-r-8 outline outline-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-indigo-500 focus:outline-indigo-500"
           >
             <option v-for="model in models" :key="model" :value="model">
               {{ model }}
@@ -115,22 +99,10 @@
           <button
             @click="submitDiagnosis"
             :disabled="files.length === 0 || loadingDiagnosis"
-            class="inline-flex items-center px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md shadow-sm hover:bg-green-700 disabled:opacity-50"
+            class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md shadow-sm hover:bg-green-700 disabled:opacity-50"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-5 w-5 mr-1"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                d="M12.317 3.553a1 1 0 0 1 1.366.366l2
-                   3a1 1 0 0 1-.366 1.366l-6.873
-                   4.0a1 1 0 0 1-1.0-1.732l6.873-4.0zM3
-                   5a2 2 0 0 0-2 2v6a2 2 0 0 0 2
-                   2h.08A7.01 7.01 0 0 1 3 11V7a2
-                   2 0 0 0-2-2z"
-              />
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 4V12C6 12.663 6.26339 13.2989 6.73223 13.7678C7.20107 14.2366 7.83696 14.5 8.5 14.5H15V12C15 11.5956 15.2436 11.2309 15.6173 11.0761C15.991 10.9214 16.4211 11.0069 16.7071 11.2929L20.7071 15.2929C21.0976 15.6834 21.0976 16.3166 20.7071 16.7071L16.7071 20.7071C16.4211 20.9931 15.991 21.0787 15.6173 20.9239C15.2436 20.7691 15 20.4045 15 20V17.5H8.5C7.04131 17.5 5.64236 16.9205 4.61091 15.8891C3.57946 14.8576 3 13.4587 3 12V4C3 3.44772 3.44772 3 4 3H5C5.55228 3 6 3.44772 6 4Z" fill="#fff"/>
             </svg>
             Run Diagnosis
           </button>
@@ -153,8 +125,8 @@
         <h2 class="text-xl font-semibold mb-2">Results</h2>
         <p class="text-gray-800">
           The model determined that the given sample(s) are
-          <span :class="overallPrediction === 'MS' ? 'text-red-600' : 'text-green-600'">
-            {{ overallPrediction === 'MS' ? 'likely to be MS' : 'not likely to be MS' }}
+          <span :class="overallPrediction === 'MSP' ? 'text-red-600' : 'text-green-600'">
+            {{ overallPrediction === 'MSP' ? 'likely to be MS' : 'not likely to be MS' }}
           </span>
           with overall confidence <strong>{{ (overallConfidence * 100).toFixed(1) }}%</strong>.
         </p>
@@ -165,7 +137,7 @@
         <h3 class="text-lg font-semibold mb-1">Analysis of {{ r.filename }}</h3>
         <p class="text-gray-800 mb-2">
           <strong>Result:</strong>
-          <span :class="r.prediction === 'MS' ? 'text-red-600' : 'text-green-600'">
+          <span :class="r.prediction === 'MSP' ? 'text-red-600' : 'text-green-600'">
             {{ r.prediction }}
           </span>
         </p>
@@ -228,7 +200,7 @@ const overallConfidence = computed(() => {
 // pick “MS,” otherwise “No MS.” Here’s a simple rule: if majority of predictions are “MS” → overall is MS
 const overallPrediction = computed(() => {
   if (!results.value.length) return "";
-  const msCount = results.value.filter((r) => r.prediction === "MS").length;
+  const msCount = results.value.filter((r) => r.prediction === "MSP").length;
   return msCount >= results.value.length / 2 ? "MS" : "No MS";
 });
 
@@ -287,10 +259,11 @@ async function submitDiagnosis() {
       // 1) Append the single file under “image”
       formData.append("image", f.raw);
 
-      // 2) Append model name (if your backend is updated to accept it).
-      // Currently your Flask looks only for “image,” but if you add support for “model,” you can
-      // uncomment the next line and update Flask to read `request.form.get("model")`.
-      // formData.append("model", selectedModel.value);
+      // 2) Append model name
+      formData.append("model_used", selectedModel.value);
+
+      // 3) Append patient ID
+      formData.append("patient_id", patientId);
 
       // Call the backend
       const resp = await diagnosisStore.runDiagnosis(formData);

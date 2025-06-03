@@ -28,6 +28,12 @@ const routes = [
     path: "/history",
     component: HistoryPage,
     meta: { requiresAuth: true }
+  },
+  {
+    path: "/diagnosis/:id/report",
+    name: "DiagnosisReport",
+    component: () => import("@/pages/DiagnosisReportPage.vue"),
+    meta: { requiresAuth: true },
   }
 ];
 

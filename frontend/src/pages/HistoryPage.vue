@@ -93,6 +93,7 @@
 <script setup>
 import { onMounted } from "vue";
 import { useDiagnosisStore } from "../stores/diagnosisStore";
+import router from "@/router/index.js";
 
 const diagnosisStore = useDiagnosisStore();
 
@@ -101,6 +102,6 @@ onMounted(() => {
 });
 
 function viewReport(record) {
-    alert(`Viewing report for ${record.patient}`);
+  router.push({ name: "DiagnosisReport", params: { id: record.id } });
 }
 </script>

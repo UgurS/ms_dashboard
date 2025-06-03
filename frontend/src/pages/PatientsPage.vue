@@ -69,7 +69,12 @@
               >
                 New Diagnosis
               </router-link>
-              <button class="text-gray-600 hover:text-gray-900">History</button>
+              <router-link
+                :to="{ path: `/diagnosis/${patient.id}/report` }"
+                class="text-gray-600 hover:text-gray-900"
+              >
+                History
+              </router-link>
             </td>
           </tr>
         </tbody>

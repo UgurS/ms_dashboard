@@ -10,6 +10,7 @@ class Diagnosis(db.Model):
     prediction = db.Column(db.String(10), nullable=False)  # "MSP" or "HC"
     confidence = db.Column(db.Float, nullable=False)
     model_used = db.Column(db.String(32), nullable=False)  # e.g. "mobilenet_v2"
+    heatmap_base64 = db.Column(db.Text, nullable=True)  # Store heatmap as base64 string
     created_at = db.Column(db.DateTime, server_default=db.func.now())
 
     samples = db.relationship('Sample', backref='diagnosis', lazy=True)
@@ -22,5 +23,6 @@ class Diagnosis(db.Model):
             "prediction": self.prediction,
             "confidence": self.confidence,
             "model_used": self.model_used,
+            "heatmap_base64": self.heatmap_base64,
             "created_at": self.created_at.isoformat()
         }
