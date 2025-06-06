@@ -1,0 +1,48 @@
+name: Deploy Backend to Azure ACR & ACI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+      - '.github/workflows/deploy-backend.yml'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Log in to Azure Container Registry
+      run: |
+        echo "${{ secrets.ACR_PASSWORD }}" | docker login ${{ secrets.ACR_LOGIN_SERVER }} \
+          --username ${{ secrets.ACR_USERNAME }} --password-stdin
+
+    - name: Build Docker image for backend
+      run: |
+        docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/msdiagnosis-api:latest ./backend
+
+    - name: Push image to ACR
+      run: |
+        docker push ${{ secrets.ACR_LOGIN_SERVER }}/msdiagnosis-api:latest
+
+    - name: Deploy to Azure Container Instance
+      uses: azure/cli@v1
+      with:
+        inlineScript: |
+          az container create \
+            --resource-group rg_group5 \
+            --name msdiagnosis-api \
+            --image ${{ secrets.ACR_LOGIN_SERVER }}/msdiagnosis-api:latest \
+            --registry-login-server ${{ secrets.ACR_LOGIN_SERVER }} \
+            --registry-username ${{ secrets.ACR_USERNAME }} \
+            --registry-password ${{ secrets.ACR_PASSWORD }} \
+            --dns-name-label msdiagnosis-group5 \
+            --ports 8000 \
+            --restart-policy Always \
+            --environment-variables FLASK_ENV=production \
+              JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} \
+              DATABASE_URL=${{ secrets.DATABASE_URL }}
