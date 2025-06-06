@@ -9,10 +9,13 @@ from flask_jwt_extended.exceptions import JWTExtendedException
 from werkzeug.exceptions import Unauthorized
 from flask_jwt_extended.exceptions import NoAuthorizationError
 from flask import jsonify
+from dotenv import load_dotenv
+import os
 
 from backend.models.base import db
 from backend.models.admin import Admin
 
+load_dotenv()
 jwt = JWTManager()
 
 
@@ -49,7 +52,12 @@ def create_app():
 
     db.init_app(app)
     jwt.init_app(app)
-    CORS(app, origins=["http://localhost:5173", "http://127.0.0.1:5173"], supports_credentials=True)
+    if os.environ.get("FLASK_ENV") == "production":
+        app.config["JWT_COOKIE_SECURE"] = True
+        origin = os.environ.get("ORIGIN", "")
+        CORS(app, origins=[origin], supports_credentials=True)
+    else:
+        CORS(app, origins=["http://localhost:5173", "http://127.0.0.1:5173"], supports_credentials=True)
 
 
     from backend.models import admin, session, patient, diagnosis, sample
