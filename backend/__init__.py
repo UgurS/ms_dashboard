@@ -63,8 +63,9 @@ def create_app():
     from backend.models import admin, session, patient, diagnosis, sample
 
     # Create tables in dev
-    with app.app_context():
-        db.create_all()
+    if app.config['DEBUG']:
+        with app.app_context():
+            db.create_all()
 
     # Register blueprints
     from backend.routes.auth import auth_bp
