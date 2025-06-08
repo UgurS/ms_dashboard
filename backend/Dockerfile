@@ -23,7 +23,7 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 COPY . ./backend
 
 # Expose port
-EXPOSE 8000
+EXPOSE 80
 
 # Run via gunicorn
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:8000", "backend.wsgi:app"]
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:80", "backend.wsgi:app"]
