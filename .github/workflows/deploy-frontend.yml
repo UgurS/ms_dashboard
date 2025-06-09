@@ -27,6 +27,8 @@ jobs:
       - name: Build Vue app
         run: npm run build
         working-directory: ./frontend
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
 
       - name: Upload to Azure Blob
         uses: azure/cli@v1
@@ -35,5 +37,5 @@ jobs:
             az storage blob upload-batch \
               --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT }} \
               --account-key ${{ secrets.AZURE_STORAGE_KEY }} \
-              --source dist \
+              --source ./frontend/dist \
               --destination \$web
