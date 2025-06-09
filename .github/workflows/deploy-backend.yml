@@ -41,7 +41,7 @@ jobs:
 #            --registry-username ${{ secrets.ACR_USERNAME }} \
 #            --registry-password ${{ secrets.ACR_PASSWORD }} \
 #            --dns-name-label msdiagnosis-group5 \
-#            --ports 8000 \
+#            --ports 80 \
 #            --restart-policy Always \
 #            --environment-variables FLASK_ENV=production \
 #              JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} \
