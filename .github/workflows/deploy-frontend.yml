@@ -38,5 +38,5 @@ jobs:
               --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT }} \
               --account-key ${{ secrets.AZURE_STORAGE_KEY }} \
               --source ./frontend/dist \
-              --destination \$web
+              --destination \$web \
               --overwrite
