@@ -8,7 +8,6 @@ from flask_jwt_extended import get_jwt_identity
 import base64
 
 diagnosis_bp = Blueprint('diagnosis', __name__)
-diagnoser = DiagnosisService()
 
 
 @diagnosis_bp.route('/', methods=['POST'])
@@ -18,6 +17,8 @@ def run_diagnosis():
     if not image_file:
         return jsonify({"error": "Missing image"}), 400
 
+    model_used = request.form.get('model_used')
+    diagnoser = DiagnosisService(model_used)
     result = diagnoser.predict(image_file)
 
     heatmap_base64 = base64.b64encode(result["heatmap"]).decode('utf-8')
@@ -34,7 +35,7 @@ def run_diagnosis():
         prediction=result["prediction"],
         confidence=result["confidence"],
         heatmap_base64=heatmap_base64,
-        model_used=request.form.get('model_used')
+        model_used=model_used
     )
 
     db.session.add(diagnosis)
@@ -58,7 +59,7 @@ def get_diagnosis_report(diagnosis_id):
         "confidence": diagnosis.confidence,
         "model_used": diagnosis.model_used,
         "heatmap_base64": diagnosis.heatmap_base64,  # store this when saving diagnosis
-        "patient_name": f"{patient.first_name} {patient.last_name}" if patient else "Unknown"
+        "patient_code": patient.patient_code if patient else "Unknown"
     })
 
 @diagnosis_bp.route('/', methods=['GET'])
@@ -74,7 +75,7 @@ def get_all_diagnoses():
         patient = Patient.query.get(diag.patient_id)
         results.append({
             "id": diag.id,
-            "patient": f"{patient.first_name} {patient.last_name}" if patient else "Unknown",
+            "patient_code": patient.patient_code if patient else "Unknown",
             "date": diag.created_at.strftime('%Y-%m-%d'),
             "diagnosis": diag.prediction,
             "confidence": f"{int(diag.confidence * 100)}%",
@@ -102,7 +103,7 @@ def get_diagnoses_for_patient(patient_id):
         patient = Patient.query.get(diag.patient_id)
         results.append({
             "id": diag.id,
-            "patient": f"{patient.first_name} {patient.last_name}" if patient else "Unknown",
+            "patient_code": patient.patient_code if patient else "Unknown",
             "date": diag.created_at.strftime('%Y-%m-%d'),
             "diagnosis": diag.prediction,
             "confidence": f"{int(diag.confidence * 100)}%",

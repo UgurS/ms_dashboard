@@ -33,10 +33,8 @@ def get_patients():
 def add_patient():
     data = request.get_json()
     patient = Patient(
-        first_name=data['first_name'],
-        last_name=data['last_name'],
-        gender=data['gender'],
-        date_of_birth=data['date_of_birth']
+        patient_code=data['patient_code'],
+        gender=data['gender']
     )
     db.session.add(patient)
     db.session.commit()

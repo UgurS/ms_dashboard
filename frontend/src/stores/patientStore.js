@@ -30,6 +30,11 @@ export const usePatientStore = defineStore("patient", {
             }
         },
 
+        setPage(page) {
+            this.page = page;
+            this.fetchPatients(page);
+        },
+
         async addPatient(patientData) {
             try {
                 const res = await api.post("/patients/", patientData);

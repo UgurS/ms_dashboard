@@ -1,19 +1,9 @@
 <template>
   <form @submit.prevent="submitForm" class="space-y-4 w-full max-w-md">
     <div>
-      <label class="block text-sm font-medium text-gray-700">First Name</label>
+      <label class="block text-sm font-medium text-gray-700">Patient Code</label>
       <input
-          v-model="form.first_name"
-          type="text"
-          required
-          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-      />
-    </div>
-
-    <div>
-      <label class="block text-sm font-medium text-gray-700">Last Name</label>
-      <input
-          v-model="form.last_name"
+          v-model="form.patient_code"
           type="text"
           required
           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
@@ -34,15 +24,6 @@
       </select>
     </div>
 
-    <div>
-      <label class="block text-sm font-medium text-gray-700">Date of Birth</label>
-      <input
-          v-model="form.date_of_birth"
-          type="date"
-          required
-          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-      />
-    </div>
 
     <div class="text-right">
       <button
@@ -65,10 +46,8 @@ import { usePatientStore } from '@/stores/patientStore.js'
 const emit = defineEmits(['added'])
 
 const form = reactive({
-  first_name: '',
-  last_name: '',
+  patient_code: '',
   gender: '',
-  date_of_birth: ''
 })
 
 const loading = ref(false)
@@ -82,10 +61,8 @@ const submitForm = async () => {
   try {
     await patientStore.addPatient(form)
     emit('added') // Notify parent to refresh
-    form.first_name = ''
-    form.last_name = ''
+    form.patient_code = ''
     form.gender = ''
-    form.date_of_birth = ''
   } catch (err) {
     error.value = err.message
   } finally {

@@ -39,6 +39,11 @@
                         >
                             Confidence
                         </th>
+                        <th
+                            class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                            Model Used
+                        </th>
                         <th class="px-4 py-2"></th>
                     </tr>
                 </thead>
@@ -56,7 +61,7 @@
                         <td
                             class="px-4 py-2 whitespace-nowrap text-sm text-gray-900"
                         >
-                            {{ record.patient }}
+                            {{ record.patient_code }}
                         </td>
                         <td
                             class="px-4 py-2 whitespace-nowrap text-sm text-gray-900"
@@ -74,6 +79,11 @@
                             {{ record.confidence }}
                         </td>
                         <td
+                            class="px-4 py-2 whitespace-nowrap text-sm text-gray-900"
+                        >
+                            {{ modelStore.getDisplayNameByModelName(record.model_used) }}
+                        </td>
+                        <td
                             class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 text-right"
                         >
                             <button
@@ -87,6 +97,14 @@
                 </tbody>
             </table>
         </div>
+
+        <Pagination
+            :currentPage="diagnosisStore.page"
+            :totalPages="diagnosisStore.pages"
+            :totalItems="diagnosisStore.total"
+            :perPage="diagnosisStore.perPage"
+            @page-change="diagnosisStore.setPage"
+        />
     </div>
 </template>
 
@@ -94,11 +112,15 @@
 import { onMounted } from "vue";
 import { useDiagnosisStore } from "../stores/diagnosisStore";
 import router from "@/router/index.js";
+import {useModelStore} from "@/stores/modelStore.js";
+import Pagination from "@/components/Pagination.vue";
 
 const diagnosisStore = useDiagnosisStore();
+const modelStore = useModelStore();
 
-onMounted(() => {
-    diagnosisStore.fetchHistoryRecords();
+onMounted(async () => {
+  await modelStore.fetchModels();
+  await diagnosisStore.fetchHistoryRecords();
 });
 
 function viewReport(record) {

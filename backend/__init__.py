@@ -72,10 +72,12 @@ def create_app():
     from backend.routes.patients import patients_bp
     from backend.routes.diagnoses import diagnosis_bp
     from backend.routes.samples import samples_bp
+    from backend.routes.models import models_bp
 
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(patients_bp, url_prefix='/api/patients')
     app.register_blueprint(diagnosis_bp, url_prefix='/api/diagnoses')
     app.register_blueprint(samples_bp, url_prefix='/api/samples')
+    app.register_blueprint(models_bp, url_prefix='/api/models')
 
     return app

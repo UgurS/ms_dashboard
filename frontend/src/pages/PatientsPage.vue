@@ -81,17 +81,12 @@
                         <th
                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                         >
-                            Name
+                            Patient Code
                         </th>
                         <th
                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                         >
                             Gender
-                        </th>
-                        <th
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                        >
-                            DOB
                         </th>
                         <th
                             class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -105,17 +100,12 @@
                         <td
                             class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
                         >
-                            {{ patient.first_name }} {{ patient.last_name }}
+                            {{ patient.patient_code }}
                         </td>
                         <td
                             class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
                         >
                             {{ patient.gender }}
-                        </td>
-                        <td
-                            class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                        >
-                            {{ patient.date_of_birth }}
                         </td>
                         <td
                             class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2"
@@ -140,6 +130,14 @@
                 </tbody>
             </table>
         </div>
+
+        <Pagination
+            :currentPage="patientStore.page"
+            :totalPages="totalPages"
+            :totalItems="patientStore.total"
+            :perPage="patientStore.perPage"
+            @page-change="patientStore.setPage"
+        />
     </div>
 </template>
 
@@ -147,10 +145,15 @@
 import { ref, computed, onMounted } from "vue";
 import { usePatientStore } from "@/stores/patientStore";
 import AddPatientForm from "@/components/patients/AddPatientForm.vue";
+import Pagination from "@/components/Pagination.vue";
 
 const patientStore = usePatientStore();
 const search = ref("");
 const showAddModal = ref(false);
+
+const totalPages = computed(() =>
+    Math.ceil(patientStore.total / patientStore.perPage)
+);
 
 onMounted(() => {
     patientStore.fetchPatients();
@@ -158,7 +161,7 @@ onMounted(() => {
 
 const filteredPatients = computed(() =>
     patientStore.patients.filter((p) => {
-        const name = `${p.first_name} ${p.last_name}`.toLowerCase();
+        const name = p.patient_code.toLowerCase();
         return name.includes(search.value.toLowerCase());
     })
 );

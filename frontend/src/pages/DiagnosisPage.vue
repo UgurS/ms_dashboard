@@ -15,8 +15,8 @@
                 ></path>
             </svg>
             <span class="text-gray-800 font-medium text-lg">{{
-                patientName
-            }}</span>
+                patientCode
+              }}</span>
         </div>
         <p class="text-gray-600 mb-6">
             You may upload one or more microscopic images of the patient’s red
@@ -124,7 +124,7 @@
                             :key="model"
                             :value="model"
                         >
-                            {{ model }}
+                            {{ model.display_name }}
                         </option>
                     </select>
                 </div>
@@ -150,6 +150,15 @@
                     </button>
                 </div>
             </div>
+
+          <div v-if="selectedModelInfo.train_set && selectedModelInfo.test_set" class="mt-4">
+              <p class="text-sm text-gray-600">
+                  <strong>Train Set:</strong> {{ selectedModelInfo.train_set }}
+              </p>
+              <p class="text-sm text-gray-600">
+                  <strong>Test Set:</strong> {{ selectedModelInfo.test_set }}
+              </p>
+          </div>
 
             <!-- 2c) LOADING / ERROR  -->
             <div v-if="loadingDiagnosis" class="text-center text-gray-500 mb-4">
@@ -229,28 +238,44 @@
 import { ref, computed, onMounted } from "vue";
 import { useDiagnosisStore } from "@/stores/diagnosisStore";
 import { usePatientStore } from "@/stores/patientStore";
+import { useModelStore } from "@/stores/modelStore";
 import { useRoute } from "vue-router";
 
 const diagnosisStore = useDiagnosisStore();
 const patientStore = usePatientStore();
+const modelStore = useModelStore();
 const route = useRoute();
 
 const patientId = route.params.id;
+const models = ref([]);
 
 // Step A: fetch the patient name so we can display it in the header
-const patientName = ref("Unknown Patient");
+const patientCode = ref("Unknown Patient");
 onMounted(async () => {
+    await modelStore.fetchModels();
+    models.value = modelStore.models.map((model) => ({
+      model_name: model.model_name,
+      display_name: model.display_name,
+      train_set: model.train_set,
+      test_set: model.test_set,
+    }));
+    if (models.value.length > 0) {
+      selectedModel.value = models.value[0];
+    }
     await patientStore.fetchPatients();
     const p = patientStore.patients.find(
         (x) => String(x.id) === String(patientId)
     );
-    if (p) patientName.value = `${p.first_name} ${p.last_name}`;
+    if (p) patientCode.value = p.patient_code
+});
+
+const selectedModelInfo = computed(() => {
+  return models.value.find((model) => model.display_name === selectedModel.value.display_name) || {};
 });
 
 // Step B: local state for files + model selector
 const files = ref([]);
-const selectedModel = ref("MobileNet-V2");
-const models = ["MobileNet-V2", "ResNet-50", "Inception-V3"];
+const selectedModel = ref(null);
 
 // Step C: store results in this component (instead of redirecting)
 const results = ref([]);
@@ -331,7 +356,7 @@ async function submitDiagnosis() {
             formData.append("image", f.raw);
 
             // 2) Append model name
-            formData.append("model_used", selectedModel.value);
+            formData.append("model_used", selectedModel.value.model_name);
 
             // 3) Append patient ID
             formData.append("patient_id", patientId);

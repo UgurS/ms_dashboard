@@ -5,10 +5,8 @@ from backend.models.base import db
 class PatientService:
     def add_patient(self, data):
         patient = Patient(
-            first_name=data['first_name'],
-            last_name=data['last_name'],
+            patient_code=data['patient_code'],
             gender=data['gender'],
-            date_of_birth=data['date_of_birth']
         )
         db.session.add(patient)
         db.session.commit()

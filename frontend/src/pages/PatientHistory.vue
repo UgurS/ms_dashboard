@@ -1,7 +1,7 @@
 <template>
     <div>
         <h1 class="text-2xl font-semibold text-gray-900 mb-6">
-            <span v-if="patientName">{{ patientName }}</span>
+            <span v-if="patientCode">{{ patientCode }}</span>
             <span v-else>Loading...</span>
         </h1>
 
@@ -23,11 +23,6 @@
                             class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                         >
                             Date
-                        </th>
-                        <th
-                            class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                        >
-                            Patient
                         </th>
                         <th
                             class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -62,11 +57,6 @@
                         <td
                             class="px-4 py-2 whitespace-nowrap text-sm text-gray-900"
                         >
-                            {{ record.patient }}
-                        </td>
-                        <td
-                            class="px-4 py-2 whitespace-nowrap text-sm text-gray-900"
-                        >
                             {{ record.diagnosis }}
                         </td>
                         <td
@@ -77,7 +67,7 @@
                         <td
                             class="px-4 py-2 whitespace-nowrap text-sm text-gray-900"
                         >
-                            {{ record.model_used }}
+                            {{ modelStore.getDisplayNameByModelName(record.model_used) }}
                         </td>
                         <td
                             class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 text-right"
@@ -93,6 +83,14 @@
                 </tbody>
             </table>
         </div>
+
+        <Pagination
+            :currentPage="currentPage"
+            :totalPages="pages"
+            :totalItems="total"
+            :perPage="perPage"
+            @page-change="fetchPatientDiagnoses"
+        />
     </div>
 </template>
 
@@ -101,14 +99,43 @@ import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useDiagnosisStore } from "@/stores/diagnosisStore.js";
 import { usePatientStore } from "@/stores/patientStore.js";
+import {useModelStore} from "@/stores/modelStore.js";
+import Pagination from "@/components/Pagination.vue";
 const diagnosisStore = useDiagnosisStore();
 const patientStore = usePatientStore();
+const modelStore = useModelStore()
 const route = useRoute();
 const router = useRouter();
+
+const currentPage = ref(1);
+const perPage = ref(10);
+const total = ref(0);
+const pages = ref(0);
 const diagnoses = ref([]);
 const loading = ref(true);
 const error = ref("");
-const patientName = ref("Unknown Patient");
+const patientCode = ref("Unknown Patient");
+
+const fetchPatientDiagnoses = async (page = 1) => {
+    loading.value = true;
+    error.value = "";
+    try {
+        const data = await diagnosisStore.getDiagnosesForPatient(
+            route.params.id,
+            page,
+            perPage.value
+        );
+        diagnoses.value = data.diagnoses;
+        currentPage.value = data.page;
+        perPage.value = data.per_page;
+        total.value = data.total;
+        pages.value = data.pages;
+    } catch (err) {
+        error.value = err.message;
+    } finally {
+        loading.value = false;
+    }
+};
 
 function viewReport(record) {
     router.push({ name: "DiagnosisReport", params: { id: record.id } });
@@ -116,19 +143,15 @@ function viewReport(record) {
 
 onMounted(async () => {
     try {
+        await modelStore.fetchModels();
         await patientStore.fetchPatients();
         const p = patientStore.patients.find(
             (x) => String(x.id) === String(route.params.id)
         );
-        if (p) patientName.value = `${p.first_name} ${p.last_name}`;
-        // Fetch all diagnoses for this patient (route.params.id)
-        const data = await diagnosisStore.getDiagnosesForPatient(
-            route.params.id
-        );
-        diagnoses.value = data.diagnoses;
+        if (p) patientCode.value = p.patient_code;
+        await fetchPatientDiagnoses();
     } catch (err) {
         error.value = err.message;
-    } finally {
         loading.value = false;
     }
 });
